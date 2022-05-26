@@ -6,7 +6,6 @@ import {
   getUserFromLocalStorage,
   removeUserFromLocalStorage,
 } from '../../../utils/localStorage'
-import { loginUserThunk, registerUserThunk, updateUserThunk } from './userThunk'
 
 const initialState = {
   isLoading: false,
@@ -14,73 +13,52 @@ const initialState = {
   isSidebarOpen: false,
 }
 
-// export const registerUser = createAsyncThunk(
-//   'user/registerUser',
-//   async (user, thunkApi) => {
-//     console.log(`Register User : ${JSON.stringify(user)}`)
-//     try {
-//       const resp = await customFetch.post('/auth/register', user)
-//       return resp.data
-//     } catch (error) {
-//       only apply to this apy,we need to check where the error is stored
-//       return thunkApi.rejectWithValue(error.response.data.msg)
-//     }
-//   }
-// )
-
 export const registerUser = createAsyncThunk(
   'user/registerUser',
-  async (user, thunkAPI) => {
-    return registerUserThunk('/auth/register', user, thunkAPI)
+  async (user, thunkApi) => {
+    // console.log(`Register User : ${JSON.stringify(user)}`)
+    try {
+      const resp = await customFetch.post('/auth/register', user)
+      return resp.data
+    } catch (error) {
+      //only apply to this apy,we need to check where the error is stored
+      return thunkApi.rejectWithValue(error.response.data.msg)
+    }
   }
 )
-
-// export const loginUser = createAsyncThunk(
-//   'user/loginUser',
-//   async (user, thunkAPI) => {
-//     try {
-//       const resp = await customFetch.post('/auth/login', user)
-//       return resp.data
-//     } catch (error) {
-//       return thunkAPI.rejectWithValue(error.response.data.msg)
-//     }
-//   }
-// )
 
 export const loginUser = createAsyncThunk(
   'user/loginUser',
   async (user, thunkAPI) => {
-    return loginUserThunk('/auth/login', user, thunkAPI)
+    try {
+      const resp = await customFetch.post('/auth/login', user)
+      return resp.data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data.msg)
+    }
   }
 )
-
-// export const updateUser = createAsyncThunk(
-//   'user/updateUser',
-//   async (user, thunkAPI) => {
-//     try {
-//       const resp = await customFetch.patch('/auth/updateUser', user, {
-//         headers: {
-//           getstate allow us to access all the state then we open the user then the user obj and we access the token
-//           authorization: `Bearer ${thunkAPI.getState().user.user.token}`,
-//         },
-//       })
-//       if we are successfull we access the data
-//       return resp.data
-//     } catch (error) {
-//       if (error.response.status === 401) {
-//         thunkAPI.dispatch(logoutUser())
-//         return thunkAPI.rejectWithValue('Unauthorized! Logging Out...')
-//       }
-//       console.log(error.response)
-//       return thunkAPI.rejectWithValue(error.response.data.msg)
-//     }
-//   }
-// )
 
 export const updateUser = createAsyncThunk(
   'user/updateUser',
   async (user, thunkAPI) => {
-    return updateUserThunk('/auth/updateUser', user, thunkAPI)
+    try {
+      const resp = await customFetch.patch('/auth/updateUser', user, {
+        headers: {
+          //getstate allow us to access all the state then we open the user then the user obj and we access the token
+          authorization: `Bearer ${thunkAPI.getState().user.user.token}`,
+        },
+      })
+      //if we are successfull we access the data
+      return resp.data
+    } catch (error) {
+      if (error.response.status === 401) {
+        thunkAPI.dispatch(logoutUser())
+        return thunkAPI.rejectWithValue('Unauthorized! Logging Out...')
+      }
+      // console.log(error.response)
+      return thunkAPI.rejectWithValue(error.response.data.msg)
+    }
   }
 )
 
@@ -91,13 +69,10 @@ const userSlice = createSlice({
     toggleSidebar: (state) => {
       state.isSidebarOpen = !state.isSidebarOpen
     },
-    logoutUser: (state, { payload }) => {
+    logoutUser: (state) => {
       state.user = null
       state.isSidebarOpen = false
       removeUserFromLocalStorage()
-      if (payload) {
-        toast.success(payload)
-      }
     },
   },
   extraReducers: {
