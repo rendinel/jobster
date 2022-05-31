@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
 import customFetch from '../../../utils/axios'
+import { getAllJobsThunk, showStatsThunk } from './allJobsThunk'
 
 const initialFiltersState = {
   search: '',
@@ -39,6 +40,8 @@ export const getAllJobs = createAsyncThunk(
   }
 )
 
+// export const getAllJobs = createAsyncThunk('allJobs/getJobs', getAllJobsThunk)
+
 export const showStats = createAsyncThunk(
   'allJobs/showStats',
   async (_, thunkAPI) => {
@@ -52,6 +55,7 @@ export const showStats = createAsyncThunk(
   }
 )
 
+// export const showStats = createAsyncThunk('allJobs/showStats', showStatsThunk)
 const allJobsSlice = createSlice({
   name: 'allJobs',
   initialState,
@@ -62,9 +66,10 @@ const allJobsSlice = createSlice({
     hideLoading: (state) => {
       state.isLoading = false
     },
+    clearAllJobsState: () => initialState,
     //action that grab the value we select from the input and use them to dinamically set the value in our state
     handleChange: (state, { payload: { name, value } }) => {
-      // state.page = 1;
+      state.page = 1
       state[name] = value
     },
     //action that set the filters back to the initial filters state
